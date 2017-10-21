@@ -1,14 +1,16 @@
 (ns river-chat.core
-  (:require [river-chat.handler :as handler]
-            [luminus.repl-server :as repl]
-            [luminus.http-server :as http]
-            [luminus-migrations.core :as migrations]
-            [river-chat.config :refer [env]]
-            [cider.nrepl :refer [cider-nrepl-handler]]
+  (:gen-class)
+  (:require [cider.nrepl :refer [cider-nrepl-handler]]
             [clojure.tools.cli :refer [parse-opts]]
             [clojure.tools.logging :as log]
-            [mount.core :as mount])
-  (:gen-class))
+            [luminus-migrations.core :as migrations]
+            [luminus.http-server :as http]
+            [luminus.repl-server :as repl]
+            [mount.core :as mount]
+            [river-chat.config :refer [env]]
+            [river-chat.db.core :as db]
+            [river-chat.handler :as handler]
+            [river-chat.message :as message]))
 
 (def cli-options
   [["-p" "--port PORT" "Port number"
@@ -60,5 +62,5 @@
       (migrations/migrate args (select-keys env [:database-url]))
       (System/exit 0))
     :else
-    (start-app args))
-  )
+    (start-app args)))
+
