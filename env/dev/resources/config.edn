@@ -4,4 +4,10 @@
  :nrepl-port 7000
  :producer   {:bootstrap.servers "localhost:9092"
               :key.serializer    "org.apache.kafka.common.serialization.ByteArraySerializer"
-              :value.serializer  "org.apache.kafka.common.serialization.ByteArraySerializer"}}
+              :value.serializer  "org.apache.kafka.common.serialization.ByteArraySerializer"}
+ :consumer   {:bootstrap.servers       "localhost:9092"
+              :value.deserializer      "org.apache.kafka.common.serialization.ByteArrayDeserializer"
+              :key.deserializer        "org.apache.kafka.common.serialization.ByteArrayDeserializer"
+              :group.id                "messages"
+              :enable.auto.commit      "true"
+              :auto.commit.interval.ms "1000"}}

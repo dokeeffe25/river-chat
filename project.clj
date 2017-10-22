@@ -11,6 +11,7 @@
                  [conman "0.6.8"]
                  [cprop "0.1.11"]
                  [funcool/struct "1.1.0"]
+                 [grete "0.1.0-SNAPSHOT"]
                  [luminus-immutant "0.2.3"]
                  [luminus-migrations "0.4.2"]
                  [luminus-nrepl "0.1.4"]
@@ -37,7 +38,8 @@
                  [ring/ring-defaults "0.3.1"]
                  [secretary "1.2.3"]
                  [selmer "1.11.1"]
-                 [com.taoensso/nippy "2.13.0"]]
+                 [com.taoensso/nippy "2.13.0"]
+                 [org.clojure/core.async "0.3.443"]]
 
   :min-lein-version "2.0.0"
 
