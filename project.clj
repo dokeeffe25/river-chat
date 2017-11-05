@@ -10,6 +10,7 @@
                  [compojure "1.6.0"]
                  [conman "0.6.8"]
                  [cprop "0.1.11"]
+                 [day8.re-frame/http-fx "0.1.4"]
                  [funcool/struct "1.1.0"]
                  [grete "0.1.0-SNAPSHOT"]
                  [luminus-immutant "0.2.3"]
@@ -88,6 +89,7 @@
    :test          [:project/dev :project/test :profiles/test]
 
    :project/dev   {:dependencies   [[prone "1.1.4"]
+                                    [day8.re-frame/trace "0.1.11"]
                                     [ring/ring-mock "0.3.1"]
                                     [ring/ring-devel "1.6.2"]
                                     [pjstadig/humane-test-output "0.8.3"]
@@ -111,6 +113,8 @@
                        :output-dir    "target/cljsbuild/public/js/out"
                        :source-map    true
                        :optimizations :none
+                       :closure-defines {"re-frame.trace.trace_enabled_QMARK_" true}
+                       :preloads [day8.re-frame.trace.preload]
                        :pretty-print  true}}}}
                    :doo            {:build "test"}
                    :source-paths   ["env/dev/clj"]
