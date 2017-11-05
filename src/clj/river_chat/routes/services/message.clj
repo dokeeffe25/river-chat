@@ -1,12 +1,13 @@
 (ns river-chat.routes.services.message
   (:require [clojure.tools.logging :as log]
+            [immutant.web.async :as async]
             [ring.util.http-response :as http-response]
-            [river-chat.message :as message]))
+            [river-chat.message.producer :as producer]))
 
 (defn send-message! [message]
   ;; TODO Validation
   (try
-    (message/send-message! message)
+    (producer/send-message! message)
     (-> {:result :ok}
         http-response/ok)
     (catch Exception e

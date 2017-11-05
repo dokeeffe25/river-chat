@@ -4,6 +4,7 @@
             [compojure.api.meta :refer [restructure-param]]
             [compojure.api.sweet :refer :all]
             [ring.util.http-response :refer :all]
+            [river-chat.message.websocket :as ws]
             [river-chat.routes.services.message :as services.message]
             [schema.core :as s]))
 
@@ -47,3 +48,7 @@
     :body [message Message]
     :summary "send a message"
     (services.message/send-message! message)))
+
+
+(defroutes websocket-routes
+  (GET "/ws" [] ws/ws-handler))

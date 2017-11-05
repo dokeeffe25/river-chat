@@ -1,25 +1,18 @@
-(ns river-chat.message
+(ns river-chat.message.consumer
   (:require [clojure.tools.logging :as log]
             [grete.consumer :as consumer]
-            [grete.producer :as producer]
             [mount.core :as mount]
             [river-chat.config :as config]
+            [river-chat.message.websocket :as ws]
             [taoensso.nippy :as nippy])
-  (:import org.apache.kafka.common.errors.WakeupException))
-
-(mount/defstate producer
-  :start (producer/producer (config/env :producer))
-  :stop (producer/close! producer))
+  (:import (org.apache.kafka.common.errors WakeupException)))
 
 
-(defn send-message! [message]
-  (producer/send! producer "messages" (nippy/freeze message)))
-
-
-(defn process-message [message]
-  (log/info "MESSAGE" (-> message
-                          (.value)
-                          nippy/thaw)))
+(defn process-message! [message]
+  (-> message
+      (.value)
+      nippy/thaw
+      ws/send-message!))
 
 
 (defn stop-consumer! [consumer-state]
@@ -28,7 +21,7 @@
 
 
 (mount/defstate consumer
-  :start (let [consumer (consumer/consumer (config/env :consumer))
+  :start (let [consumer  (consumer/consumer (config/env :consumer))
                continue? (atom true)]
            (consumer/subscribe! consumer ["messages"])
            (future
@@ -37,10 +30,10 @@
                  (try
                    (let [messages (consumer/poll! consumer 1000)]
                      (doseq [message messages]
-                       (process-message message)))
+                       (process-message! message)))
                    (catch WakeupException _)))
                (finally
                  (consumer/close! consumer))))
-           {:consumer consumer
+           {:consumer  consumer
             :continue? continue?})
   :stop (stop-consumer! consumer))

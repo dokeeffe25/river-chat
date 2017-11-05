@@ -18,6 +18,19 @@ body {
 .navbar-nav .nav-link + .nav-link {
   margin-left: 0;
 }
+#message-entry {
+    position: fixed;
+    bottom: 0;
+    left: 200px;
+    padding: 15px;
+}
+#message-entry > input {
+    width: 100%;
+    padding: 5px 8px;
+    border-radius: 3px;
+    outline: 0;
+    border: 1px solid #ddd;
+}
 @media (min-width: 34em) {
   .navbar-brand {
     float: left;

@@ -10,11 +10,15 @@
             [river-chat.config :refer [env]]
             [river-chat.db.core :as db]
             [river-chat.handler :as handler]
-            [river-chat.message :as message]))
+            [river-chat.message.consumer :as consumer]
+            [river-chat.message.producer :as producer]
+            [river-chat.message.websocket :as ws]))
+
 
 (def cli-options
   [["-p" "--port PORT" "Port number"
     :parse-fn #(Integer/parseInt %)]])
+
 
 (mount/defstate ^{:on-reload :noop}
                 http-server
@@ -25,6 +29,7 @@
                       (update :port #(or (-> env :options :port) %))))
                 :stop
                 (http/stop http-server))
+
 
 (mount/defstate ^{:on-reload :noop}
                 repl-server
@@ -41,6 +46,7 @@
     (log/info component "stopped"))
   (shutdown-agents))
 
+
 (defn start-app [args]
   (doseq [component (-> args
                         (parse-opts cli-options)
@@ -48,6 +54,7 @@
                         :started)]
     (log/info component "started"))
   (.addShutdownHook (Runtime/getRuntime) (Thread. stop-app)))
+
 
 (defn -main [& args]
   (cond
@@ -63,4 +70,3 @@
       (System/exit 0))
     :else
     (start-app args)))
-

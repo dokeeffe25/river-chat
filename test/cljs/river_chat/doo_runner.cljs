@@ -3,4 +3,3 @@
             [river-chat.core-test]))
 
 (doo-tests 'river-chat.core-test)
-

@@ -7,8 +7,11 @@
             [markdown.core :refer [md->html]]
             [ajax.core :refer [GET POST]]
             [river-chat.ajax :refer [load-interceptors!]]
-            [river-chat.events])
+            [river-chat.chat.events]
+            [river-chat.chat.subscriptions]
+            [river-chat.chat.views :as chat])
   (:import goog.History))
+
 
 (defn nav-link [uri title page collapsed?]
   (let [selected-page (rf/subscribe [:page])]
@@ -17,6 +20,7 @@
      [:a.nav-link
       {:href uri
        :on-click #(reset! collapsed? true)} title]]))
+
 
 (defn navbar []
   (r/with-let [collapsed? (r/atom true)]
@@ -30,34 +34,43 @@
        [nav-link "#/" "Home" :home collapsed?]
        [nav-link "#/about" "About" :about collapsed?]]]]))
 
+
 (defn about-page []
   [:div.container
    [:div.row
     [:div.col-md-12
      [:img {:src (str js/context "/img/warning_clojure.png")}]]]])
 
-(defn home-page []
-  [:div.container
-   "hello"])
 
 (def pages
-  {:home #'home-page
+  {:chat #'chat/chat-page
    :about #'about-page})
+
+
+(rf/reg-sub
+  :page
+  (fn [db _]
+    (:page db)))
+
+
 
 (defn page []
   [:div
-   [navbar]
    [(pages @(rf/subscribe [:page]))]])
+
 
 ;; -------------------------
 ;; Routes
 (secretary/set-config! :prefix "#")
 
+
 (secretary/defroute "/" []
-  (rf/dispatch [:set-active-page :home]))
+  (rf/dispatch [:set-active-page :chat]))
+
 
 (secretary/defroute "/about" []
   (rf/dispatch [:set-active-page :about]))
+
 
 ;; -------------------------
 ;; History
@@ -70,11 +83,13 @@
         (secretary/dispatch! (.-token event))))
     (.setEnabled true)))
 
+
 ;; -------------------------
 ;; Initialize app
 (defn mount-components []
   (rf/clear-subscription-cache!)
   (r/render [#'page] (.getElementById js/document "app")))
+
 
 (defn init! []
   (rf/dispatch-sync [:initialize-db])
