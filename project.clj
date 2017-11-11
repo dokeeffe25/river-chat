@@ -40,7 +40,8 @@
                  [secretary "1.2.3"]
                  [selmer "1.11.1"]
                  [com.taoensso/nippy "2.13.0"]
-                 [org.clojure/core.async "0.3.443"]]
+                 [org.clojure/core.async "0.3.443"]
+                 [com.cognitect/transit-cljs "0.8.243"]]
 
   :min-lein-version "2.0.0"
 
@@ -103,7 +104,7 @@
                                     [org.clojure/clojurescript "1.9.908"]]
                    :cljsbuild
                    {:builds
-                    {:app
+                    {:dev
                      {:source-paths ["src/cljs" "src/cljc" "env/dev/cljs"]
                       :figwheel     {:on-jsload "river-chat.core/mount-components"}
                       :compiler
@@ -113,7 +114,7 @@
                        :output-dir    "target/cljsbuild/public/js/out"
                        :source-map    true
                        :optimizations :none
-                       :closure-defines {"re-frame.trace.trace_enabled_QMARK_" true}
+                       :closure-defines {"re_frame.trace.trace_enabled_QMARK_" true}
                        :preloads [day8.re-frame.trace.preload]
                        :pretty-print  true}}}}
                    :doo            {:build "test"}

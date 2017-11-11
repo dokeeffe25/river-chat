@@ -2,7 +2,7 @@
   (:require [compojure.core :refer [routes wrap-routes]]
             [river-chat.layout :refer [error-page]]
             [river-chat.routes.home :refer [home-routes]]
-            [river-chat.routes.services :refer [service-routes]]
+            [river-chat.routes.services :refer [service-routes websocket-routes]]
             [compojure.route :as route]
             [river-chat.env :refer [defaults]]
             [mount.core :as mount]
@@ -14,6 +14,7 @@
 
 (def app-routes
   (routes
+    #'websocket-routes
     (-> #'home-routes
         (wrap-routes middleware/wrap-csrf)
         (wrap-routes middleware/wrap-formats))

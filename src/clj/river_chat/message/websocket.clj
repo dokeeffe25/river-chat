@@ -1,7 +1,6 @@
 (ns river-chat.message.websocket
   (:require [clojure.tools.logging :as log]
-            [immutant.web.async :as async]
-            [mount.core :as mount]))
+            [immutant.web.async :as async]))
 
 
 (defonce channels (atom #{}))
@@ -17,16 +16,15 @@
   (swap! channels #(remove #{channel} %)))
 
 
+(defn send-message! [message]
+  (doseq [channel @channels]
+    (async/send! channel (pr-str message))))
+
+
 (def websocket-callbacks
   "WebSocket callback functions"
   {:on-open connect!
-   :on-close disconnect!
-   :on-message #()})
-
-
-(defn send-message! [message]
-  (doseq [channel @channels]
-    (async/send! channel message)))
+   :on-close disconnect!})
 
 
 (defn ws-handler [request]
