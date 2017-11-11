@@ -8,6 +8,15 @@
    "Sidebar"])
 
 
+(defn message-list []
+  (let [messages (rf/subscribe [:messages])]
+    [:div.col-md-12
+     [:ul
+      (for [[i message] (map-indexed vector @messages)]
+        ^{:key i}
+        [:li (:message message)])]]))
+
+
 (defn chat-input []
   (let [val (r/atom "")]
     (fn []
@@ -24,7 +33,7 @@
 
 (defn chat-window []
   [:div.col-md-9.col-xl-10
-   "Chat Window"
+   [message-list]
    [chat-input]])
 
 

@@ -1,10 +1,12 @@
 (ns river-chat.chat.events
-  (:require [day8.re-frame.http-fx]
-            [river-chat.chat.db :as db]
-            [re-frame.core :as rf]
+  (:require [ajax.core :as ajax]
             [cljs.spec.alpha :as s]
-            [ajax.core :as ajax]))
-
+            [cljs.tools.reader.edn :as edn]
+            [cognitect.transit :as transit]
+            [day8.re-frame.http-fx]
+            [re-frame.core :as rf]
+            [river-chat.chat.db :as db]))
+(enable-console-print!)
 
 (defn check-and-throw [a-spec db]
   (when-not (s/valid? a-spec db)
@@ -18,11 +20,41 @@
                         rf/trim-v])
 
 
-(rf/reg-event-db
+(def json-reader (transit/reader :json))
+
+(defn receive-message []
+  (fn [msg]
+    (rf/dispatch
+      [:chat/receive-message (->> msg
+                                  .-data
+                                  edn/read-string)])))
+
+
+
+
+(defn make-websocket! [url]
+  (if-let [chan (js/WebSocket. url)]
+    (do (set! (.-onmessage chan) (receive-message))
+        chan)
+    (do (throw (js/Error. "Websocket connection failed"))
+        nil)))
+
+
+(rf/reg-cofx
+  :ws-chan
+  (fn [cofx _]
+    (assoc cofx :ws-chan (make-websocket! "ws://localhost:3000/ws"))))
+
+
+(defn initialize-db [cofx _]
+  {:db (assoc db/default-db :ws-chan (:ws-chan cofx))})
+
+
+(rf/reg-event-fx
   :initialize-db
-  [chat-interceptors]
-  (fn [_ _]
-    db/default-db))
+  [(rf/inject-cofx :ws-chan)
+   chat-interceptors]
+  initialize-db)
 
 
 (rf/reg-event-db
@@ -30,6 +62,13 @@
   [chat-interceptors]
   (fn [db [page]]
     (assoc db :page page)))
+
+
+(rf/reg-event-db
+  :chat/receive-message
+  [chat-interceptors]
+  (fn [db [msg]]
+    (update-in db [:messages] conj msg)))
 
 
 (rf/reg-event-fx
@@ -44,3 +83,9 @@
                   :response-format (ajax/json-response-format)
                   :on-success [:chat/send-message-success]
                   :on-failure [:chat/send-message-failure]}}))
+
+(rf/reg-event-db
+  :chat/send-message-success
+  [chat-interceptors]
+  (fn [db _]
+    db))

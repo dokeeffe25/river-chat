@@ -6,3 +6,9 @@
   :docs
   (fn [db _]
     (:docs db)))
+
+
+(rf/reg-sub
+  :messages
+  (fn [db _]
+    (:messages db)))
