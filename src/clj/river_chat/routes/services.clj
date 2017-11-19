@@ -5,8 +5,18 @@
             [compojure.api.sweet :refer :all]
             [ring.util.http-response :refer :all]
             [river-chat.message.websocket :as ws]
+            [river-chat.routes.services.auth :as services.auth]
             [river-chat.routes.services.message :as services.message]
             [schema.core :as s]))
+
+
+(s/defschema UserRegistration
+  {:id           String
+   :pass         String
+   :pass-confirm String
+   :email        String
+   :first_name   String
+   :last_name    String})
 
 
 (s/defschema Result
@@ -38,11 +48,16 @@
 
 
 (defapi service-routes
-  {:swagger {:ui "/swagger-ui"
+  {:swagger {:ui   "/swagger-ui"
              :spec "/swagger.json"
-             :data {:info {:version "1.0.0"
-                           :title "River Chat API"
+             :data {:info {:version     "1.0.0"
+                           :title       "River Chat API"
                            :description "Services"}}}}
+  (POST "/register" req
+    :return Result
+    :body [user UserRegistration]
+    :summary "register a new user"
+    (services.auth/register! req user))
   (POST "/send-message" req
     :return Result
     :body [message Message]
