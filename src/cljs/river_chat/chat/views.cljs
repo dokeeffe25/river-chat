@@ -27,7 +27,8 @@
                 :auto-focus true
                 :on-change #(reset! val (-> % .-target .-value))
                 :on-key-down #(case (.-which %)
-                                13 (rf/dispatch [:chat/send-message @val])
+                                13 (do (rf/dispatch [:chat/send-message @val])
+                                       (reset! val ""))
                                 nil)}]])))
 
 
